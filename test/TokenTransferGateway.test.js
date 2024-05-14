@@ -11,13 +11,13 @@ describe("TokenTransferGateway", function () {
 
   beforeEach(async function () {
     TokenTransferGateway = await ethers.getContractFactory("TokenTransferGateway");
-    [owner, addr1, addr2, _] = await ethers.getSigners();
+    [owner, addr1, addr2] = await ethers.getSigners();
     gateway = await TokenTransferGateway.deploy(owner.address);
-    await gateway.deployed();
+    await gateway.waitForDeployment();
 
     const Token = await ethers.getContractFactory("ERC20Mock");
-    token = await Token.deploy("MockToken", "MTK", owner.address, ethers.utils.parseEther("1000"));
-    await token.deployed();
+    token = await Token.deploy("MockToken", "MTK", owner.address, ethers.parseUnits("1000", 18));
+    await token.waitForDeployment();
   });
 
   it("Should set the right owner", async function () {
@@ -25,26 +25,28 @@ describe("TokenTransferGateway", function () {
   });
 
   it("Should allow owner to set token whitelist", async function () {
-    await gateway.setTokenWhitelist(token.address, true);
-    expect(await gateway.allowedTokens(token.address)).to.be.true;
+    await gateway.setTokenWhitelist(token.target, true);
+    expect(await gateway.allowedTokens(token.target)).to.be.true;
   });
 
   it("Should transfer native currency with fee", async function () {
-    const amount = ethers.utils.parseEther("1");
+    const amount = ethers.parseUnits("1", 18);
     await gateway.connect(addr1).transferNative(addr2.address, { value: amount });
-    const fee = amount.mul(50).div(10000);
+    const fee = amount.mul(ethers.BigNumber.from(50)).div(ethers.BigNumber.from(10000));
     const amountAfterFee = amount.sub(fee);
 
-    // Add your assertions here
+    // Check balances
+    const recipientBalance = await ethers.provider.getBalance(addr2.address);
+    expect(recipientBalance).to.equal(amountAfterFee);
   });
 
   it("Should transfer ERC20 tokens with fee", async function () {
-    await gateway.setTokenWhitelist(token.address, true);
-    const amount = ethers.utils.parseEther("100");
+    await gateway.setTokenWhitelist(token.target, true);
+    const amount = ethers.parseUnits("100", 18);
     await token.connect(owner).transfer(addr1.address, amount);
-    await token.connect(addr1).approve(gateway.address, amount);
-    await gateway.connect(addr1).transferToken(token.address, addr2.address, amount);
-    const fee = amount.mul(50).div(10000);
+    await token.connect(addr1).approve(gateway.target, amount);
+    await gateway.connect(addr1).transferToken(token.target, addr2.address, amount);
+    const fee = amount.mul(ethers.BigNumber.from(50)).div(ethers.BigNumber.from(10000));
     const amountAfterFee = amount.sub(fee);
 
     expect(await token.balanceOf(addr2.address)).to.equal(amountAfterFee);
@@ -58,8 +60,9 @@ describe("TokenTransferGateway", function () {
 
   it("Should pause and unpause the contract", async function () {
     await gateway.pause();
-    await expect(gateway.transferNative(addr2.address, { value: 1 })).to.be.revertedWith("Pausable: paused");
+    await expect(gateway.transferNative(addr2.address, { value: ethers.parseUnits("1", 18) }))
+      .to.be.revertedWith("Pausable: paused");
     await gateway.unpause();
-    await expect(gateway.transferNative(addr2.address, { value: 1 })).to.not.be.reverted;
+    await expect(gateway.transferNative(addr2.address, { value: ethers.parseUnits("1", 18) })).to.not.be.reverted;
   });
 });
