@@ -35,7 +35,7 @@ describe("TokenTransferGateway", function () {
     const fee = amount.mul(ethers.BigNumber.from(50)).div(ethers.BigNumber.from(10000));
     const amountAfterFee = amount.sub(fee);
 
-    // Adicione uma verificação para o saldo após a transferência
+    // Check balances
     const recipientBalance = await ethers.provider.getBalance(addr2.address);
     expect(recipientBalance).to.equal(amountAfterFee);
   });

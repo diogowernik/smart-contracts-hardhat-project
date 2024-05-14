@@ -4,9 +4,10 @@ pragma solidity ^0.8.24;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "hardhat/console.sol";
 
-contract TokenTransferGateway is Ownable, Pausable {
+contract TokenTransferGateway is Ownable, Pausable, ReentrancyGuard {
     // Constructor to set the initial owner
     constructor(address initialOwner) Ownable(initialOwner) {}
 
@@ -35,7 +36,7 @@ contract TokenTransferGateway is Ownable, Pausable {
      * @dev Transfer native currency with a fee.
      * @param recipient The address of the recipient.
      */
-    function transferNative(address payable recipient) external payable whenNotPaused {
+    function transferNative(address payable recipient) external payable whenNotPaused nonReentrant {
         require(msg.value > 0, "Amount must be greater than zero");
         uint256 fee = (msg.value * feeBps) / 10000;
         uint256 amountAfterFee = msg.value - fee;
@@ -56,7 +57,7 @@ contract TokenTransferGateway is Ownable, Pausable {
      * @param recipient The address of the recipient.
      * @param amount The amount of tokens to transfer.
      */
-    function transferToken(address token, address recipient, uint256 amount) external whenNotPaused {
+    function transferToken(address token, address recipient, uint256 amount) external whenNotPaused nonReentrant {
         require(allowedTokens[token], "Token not permitted");
         require(amount > 0, "Amount must be greater than zero");
         uint256 fee = (amount * feeBps) / 10000;
