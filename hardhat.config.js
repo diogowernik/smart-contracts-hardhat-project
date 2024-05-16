@@ -13,9 +13,9 @@ const {
   // Private key for deploying contracts 
   PRIVATE_KEY,
   // Testnet 
-  GOERLI_ALCHEMY_KEY,
+  SEPOLIA_ALCHEMY_KEY,
   BSC_TESTNET_KEY,
-  MUMBAI_ALCHEMY_KEY,
+  AMOY_ALCHEMY_KEY,
   // Mainnet
   ETH_MAINNET_ALCHEMY_KEY,
   BSC_MAINNET_ALCHEMY_KEY,
@@ -26,6 +26,9 @@ const {
   ETHERSCAN_API_KEY
 } = process.env;
 
+// log the environment variables
+// console.log("BSC_TESTNET_KEY:", BSC_TESTNET_KEY);
+
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.24",
@@ -34,14 +37,14 @@ module.exports = {
     hardhat: {
       chainId: 1337,
     },
-    // Goerli test network
-    goerli: {
-      url: GOERLI_ALCHEMY_KEY,
+    // Sepolia test network
+    sepolia: {
+      url: SEPOLIA_ALCHEMY_KEY,
       accounts: [`0x${PRIVATE_KEY}`],
     },
-    // Mumbai (Polygon) test network
-    mumbai: {
-      url: MUMBAI_ALCHEMY_KEY,
+    // Amoy (Polygon) test network
+    amoy: {
+      url: AMOY_ALCHEMY_KEY,
       accounts: [`0x${PRIVATE_KEY}`],
     },
     // Binance Smart Chain test network
