@@ -1,8 +1,8 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("TokenTransferGateway", function () {
-  let TokenTransferGateway;
+describe("TransferGateway", function () {
+  let TransferGateway;
   let gateway;
   let owner;
   let addr1;
@@ -10,12 +10,12 @@ describe("TokenTransferGateway", function () {
   let token;
 
   beforeEach(async function () {
-    // Obter a fábrica do contrato TokenTransferGateway
-    TokenTransferGateway = await ethers.getContractFactory("TokenTransferGateway");
+    // Obter a fábrica do contrato TransferGateway
+    TransferGateway = await ethers.getContractFactory("TransferGateway");
     [owner, addr1, addr2] = await ethers.getSigners();
     
-    // Implantar o contrato TokenTransferGateway
-    gateway = await TokenTransferGateway.deploy(owner.address);
+    // Implantar o contrato TransferGateway
+    gateway = await TransferGateway.deploy(owner.address);
     await gateway.waitForDeployment(); // Esperar a implantação ser finalizada
 
     // Obter a fábrica do contrato ERC20Mock

@@ -1,16 +1,16 @@
 const { ethers } = require("hardhat");
 
 describe("Gas Usage", function () {
-  let TokenTransferGateway;
+  let TransferGateway;
   let gateway;
   let owner;
   let addr1;
   let token;
 
   beforeEach(async function () {
-    TokenTransferGateway = await ethers.getContractFactory("TokenTransferGateway");
+    TransferGateway = await ethers.getContractFactory("TransferGateway");
     [owner, addr1] = await ethers.getSigners();
-    gateway = await TokenTransferGateway.deploy(owner.address);
+    gateway = await TransferGateway.deploy(owner.address);
     await gateway.waitForDeployment();
 
     const Token = await ethers.getContractFactory("ERC20Mock");

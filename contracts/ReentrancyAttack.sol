@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "./TokenTransferGateway.sol";
+import "./TransferGateway.sol";
 
 contract ReentrancyAttack {
-    TokenTransferGateway public gateway;
+    TransferGateway public gateway;
 
     constructor(address gatewayAddress) {
-        gateway = TokenTransferGateway(gatewayAddress);
+        gateway = TransferGateway(gatewayAddress);
     }
 
     receive() external payable {

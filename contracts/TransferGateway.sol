@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "hardhat/console.sol";
 
-contract TokenTransferGateway is Ownable, Pausable, ReentrancyGuard {
+contract TransferGateway is Ownable, Pausable, ReentrancyGuard {
     // Constructor to set the initial owner
     constructor(address initialOwner) Ownable(initialOwner) {}
 

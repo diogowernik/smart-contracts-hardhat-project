@@ -1,13 +1,24 @@
 from django.db import models
 from django.contrib.auth.models import User
+    
+class WtreeProfile(models.Model):
+    # no need to store balance here, it can be calculated from the transactions and get from the wallet via web3
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-class WtreeUser(User):
-    address = models.CharField(max_length=42)  # Endereços Ethereum têm 42 caracteres
+    username = models.CharField(max_length=50, unique=True) # no frontend será algo do tipo https://wtr.ee/user.name
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+
+    selected_networks = models.ManyToManyField('Network', related_name='profiles_selected', blank=True) # networks that user accepts to receive tokens or natives
+    selected_natives = models.ManyToManyField('Native', related_name='profiles_selected', blank=True) # natives that user accepts to receive
+    selected_tokens = models.ManyToManyField('Token', related_name='profiles_selected', blank=True) # tokens that user accepts to receive
+    wallets = models.ManyToManyField('Wallet', related_name='profiles', blank=True) # wallets that this profile uses, initially it will be only one wallet per profile, ethereum wallet (matic, bnb and eth), but need to think for example in bitcoin or fiat wallets in same profile.
+    
 
     def __str__(self):
-        return f"{self.username} - {self.address}"
+        return f"{self.user.username}"
 
-class Chain(models.Model):
+class Network(models.Model):
     name = models.CharField(max_length=50)
     slug = models.SlugField()
     icon_url = models.URLField(blank=True, null=True)
@@ -19,7 +30,7 @@ class Token(models.Model):
     name = models.CharField(max_length=50)
     symbol = models.CharField(max_length=10)
     contract_address = models.CharField(max_length=42)  # Endereço típico do Ethereum
-    chain = models.ForeignKey(Chain, on_delete=models.CASCADE, related_name='tokens')
+    blockchain = models.ForeignKey(Network, on_delete=models.CASCADE, related_name='tokens')
     icon_url = models.URLField(blank=True, null=True)
     slug = models.SlugField()
     decimals = models.IntegerField(default=18)
@@ -36,12 +47,12 @@ class Token(models.Model):
 class Native(models.Model):
     name = models.CharField(max_length=50)  # Ex: "Ethereum", "Binance Coin", "Polygon"
     symbol = models.CharField(max_length=10)  # Ex: "ETH", "BNB", "MATIC"
-    blockchain = models.CharField(max_length=50)  # Ex: "Ethereum", "Binance Smart Chain", "Polygon"
+    blockchain = models.ForeignKey(Network, on_delete=models.CASCADE, related_name='natives')
 
     def __str__(self):
         return f"{self.name} ({self.symbol}) on {self.blockchain}"
 
-class Account(models.Model):
+class Wallet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.CharField(max_length=42)  # Endereços Ethereum têm 42 caracteres
 
@@ -57,8 +68,8 @@ class FeeSetting(models.Model):
 
 
 class TransactionNative(models.Model):
-    sender = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='sent_native_transactions')
-    recipient = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='received_native_transactions')
+    sender = models.ForeignKey(Wallet, on_delete=models.CASCADE, related_name='sent_native_transactions')
+    recipient = models.ForeignKey(Wallet, on_delete=models.CASCADE, related_name='received_native_transactions')
     native = models.ForeignKey(Native, on_delete=models.CASCADE)  # Referência ao modelo Native
     amount = models.DecimalField(max_digits=19, decimal_places=4)
     fee = models.DecimalField(max_digits=19, decimal_places=4)
@@ -67,9 +78,9 @@ class TransactionNative(models.Model):
     def __str__(self):
         return f"From {self.sender} to {self.recipient} - {self.amount} {self.native.symbol}"
 
-class TransactionToken(models.Model):
-    sender = models.ForeignKey(Account, related_name='sent_token_transactions', on_delete=models.CASCADE)
-    recipient = models.ForeignKey(Account, related_name='received_token_transactions', on_delete=models.CASCADE)
+class TokenTransaction(models.Model):
+    sender = models.ForeignKey(Wallet, related_name='sent_token_transactions', on_delete=models.CASCADE)
+    recipient = models.ForeignKey(Wallet, related_name='received_token_transactions', on_delete=models.CASCADE)
     token = models.ForeignKey(Token, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=19, decimal_places=4)
     fee = models.DecimalField(max_digits=19, decimal_places=4)

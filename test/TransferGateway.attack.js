@@ -2,7 +2,7 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 describe("Reentrancy Attack Simulation", function () {
-  let TokenTransferGateway;
+  let TransferGateway;
   let gateway;
   let owner;
   let attacker;
@@ -10,9 +10,9 @@ describe("Reentrancy Attack Simulation", function () {
   let attackContract;
 
   beforeEach(async function () {
-    TokenTransferGateway = await ethers.getContractFactory("TokenTransferGateway");
+    TransferGateway = await ethers.getContractFactory("TransferGateway");
     [owner, attacker] = await ethers.getSigners();
-    gateway = await TokenTransferGateway.deploy(owner.address);
+    gateway = await TransferGateway.deploy(owner.address);
     await gateway.waitForDeployment();
 
     AttackContract = await ethers.getContractFactory("ReentrancyAttack");
