@@ -1,0 +1,38 @@
+/
+├── contracts/
+│   ├── core/
+│   │   ├── TransferGateway.sol      # Contrato principal de transferência
+│   │   └── LendingPool.sol          # Contrato principal para o pool de empréstimos
+│   ├── interfaces/
+│   │   ├── IERC20.sol
+│   │   ├── ILendingPool.sol
+│   │   └── ITransferGateway.sol
+│   ├── modules/
+│   │   ├── AccessControl.sol
+│   │   ├── FeeAndWhitelistManagement.sol
+│   │   ├── TransferFunctions.sol
+│   │   ├── LoanManagement.sol       # Módulo para gerenciamento de empréstimos
+│   │   └── CollateralManagement.sol # Módulo para gerenciamento de colaterais
+│   ├── governance/
+│   │   ├── GovernanceToken.sol      # Contrato para tokens de governança
+│   │   └── Voting.sol               # Contrato para mecanismos de votação
+│   ├── libraries/
+│   │   ├── SafeMath.sol
+│   │   └── DataStructures.sol       # Bibliotecas para estruturas de dados complexas
+├── test/
+│   ├── core/
+│   │   ├── transferGateway.test.js
+│   │   └── lendingPool.test.js
+│   ├── modules/
+│   │   ├── accessControl.test.js
+│   │   ├── loanManagement.test.js
+│   │   └── collateralManagement.test.js
+│   ├── governance/
+│   │   ├── governanceToken.test.js
+│   │   └── voting.test.js
+├── scripts/
+│   ├── deploy.js
+│   ├── deployTransferGateway.js
+│   └── deployLendingPool.js
+├── artifacts/
+└── hardhat.config.js
